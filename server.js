@@ -14,7 +14,9 @@ app.use(bodyParser.json());
 // Connect database
 connectDB();
 
-
+app.get("/", (req, res) => {
+    res.send("server is running");
+});
 // ================== AUTH ==================
 
 // Register
@@ -149,6 +151,8 @@ app.get("/summary", async (req, res) => {
         categories: categories.size
     });
 });
-app.listen(5000, () => {
-    console.log("Server running on http://localhost:5000 🚀");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
