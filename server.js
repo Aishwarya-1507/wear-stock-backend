@@ -29,7 +29,19 @@ app.post("/register", async (req, res) => {
         const db = getDB();
         const { username, email, password } = req.body;
 
-        await db.collection("users").insertOne({ username, email, password });
+        // STRONG PASSWORD CHECK
+        const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+        if (!strongPassword.test(password)) {
+            return res.json({ error: "Weak password ❌" });
+        }
+
+        await db.collection("users").insertOne({
+            username,
+            email,
+            password
+        });
+
         res.json({ message: "User Registered ✅" });
 
     } catch (err) {
