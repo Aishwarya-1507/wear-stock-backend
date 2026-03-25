@@ -85,7 +85,13 @@ app.post("/login", async (req, res) => {
 // Add Item
 app.post("/add-item", async (req, res) => {
     try {
+        const db = getDB();
         const { name, category, size, qty } = req.body;
+
+        // simple check
+        if (!name || !category || !size || qty === undefined) {
+            return res.json({ error: "Missing fields ❌" });
+        }
 
         const id = await getNextSequence("itemId");
 
@@ -98,6 +104,7 @@ app.post("/add-item", async (req, res) => {
         });
 
         res.json({ message: "Item Added ✅" });
+
     } catch (err) {
         console.log(err);
         res.json({ error: "Add failed ❌" });
