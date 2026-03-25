@@ -90,7 +90,7 @@ app.post("/add-item", async (req, res) => {
 });
 
 // Get Items
-app.get("/items", async (req, res) => {
+app.get("/item", async (req, res) => {
     try {
         const db = getDB();
         const items = await db.collection("items").find().toArray();
