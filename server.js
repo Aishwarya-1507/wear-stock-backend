@@ -86,27 +86,23 @@ app.post("/login", async (req, res) => {
 app.post("/add-item", async (req, res) => {
     try {
         const db = getDB();
-        const { name, category, size, qty } = req.body;
 
-        // simple check
-        if (!name || !category || !size || qty === undefined) {
-            return res.json({ error: "Missing fields ❌" });
-        }
+        console.log("BODY:", req.body); // 🔥 important
 
         const id = await getNextSequence("itemId");
 
         await db.collection("items").insertOne({
-            id,
-            name,
-            category,
-            size,
-            qty: Number(qty)
+            id: id,
+            name: req.body.name,
+            category: req.body.category,
+            size: req.body.size,
+            qty: Number(req.body.qty)
         });
 
         res.json({ message: "Item Added ✅" });
 
     } catch (err) {
-        console.log(err);
+        console.log("ERROR:", err);
         res.json({ error: "Add failed ❌" });
     }
 });
