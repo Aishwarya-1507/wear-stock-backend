@@ -1,30 +1,45 @@
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
-// Get URL from .env
-const url = process.env.MONGO_URL;
-
-// Create client (with proper options)
-const client = new MongoClient(url);
+const uri = process.env.MONGO_URL;
+const client = new MongoClient(uri);
 
 let db;
 
-// Connect to MongoDB Atlas
 async function connectDB() {
     try {
+        if (db) return db; // Return existing connection if already connected
+        
         await client.connect();
-        console.log("MongoDB Atlas Connected ✅");
-
         db = client.db("wearstock");
-
-    } catch (error) {
-        console.error("MongoDB Connection Failed ❌", error);
+        console.log("MongoDB Connected ✅");
+        return db;
+    } catch (err) {
+        console.error("DB Error ❌", err);
+        process.exit(1); // Stop the server if DB fails
     }
 }
 
-// Export DB
+// Function to get the current DB instance
 function getDB() {
+    if (!db) {
+        throw new Error("Database not initialized. Call connectDB first.");
+    }
     return db;
 }
 
-module.exports = { connectDB, getDB };
+// Sequence Generator for IDs
+async function getNextSequence(name) {
+    const database = getDB();
+    const result = await database.collection("counters").findOneAndUpdate(
+        { _id: name },
+        { $inc: { sequence_value: 1 } },
+        { returnDocument: "after", upsert: true }
+    );
+    
+    // Fix for driver version differences
+    const doc = result.value || result;
+    return doc.sequence_value;
+}
+
+module.exports = { connectDB, getDB, getNextSequence };
