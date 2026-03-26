@@ -30,13 +30,12 @@ function getDB() {
 
 // Sequence Generator for IDs
 async function getNextSequence(name) {
-    const database = getDB();
-    const result = await database.collection("counters").findOneAndUpdate(
+    const db = getDB();
+    const result = await db.collection("counters").findOneAndUpdate(
         { _id: name },
         { $inc: { sequence_value: 1 } },
         { returnDocument: "after", upsert: true }
     );
-    
     // Fix for driver version differences
     const doc = result.value || result;
     return doc.sequence_value;
